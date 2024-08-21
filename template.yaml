@@ -1,0 +1,129 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: matthew-pepsico-template
+  title: Matthew Azure DevOps Project Onboarding
+  description: Azure DevOps Project Onboarding
+  tags:
+    - matthew
+    - pepsico
+spec:
+  owner: rhdh
+  type: service
+  parameters:
+    - title: Project
+      required:
+        - ado_platform
+      properties:
+        sector:
+          title: Sector
+          type: string
+          enum:
+            - CGF
+            - MAB
+            - GRN
+        ado_platform:
+          title: ADO Platform
+          type: string
+          enum:
+            - Production
+            - Staging
+            - Development
+        have_ado_proeject:
+          title: Do you have an ADO Project?
+          type: string
+          enum:
+            - No
+            - Yes 
+      dependencies:
+        have_ado_proeject:
+          oneOf:
+            - properties:
+                have_ado_proeject:
+                  enum:
+                    - No 
+            - properties:
+                have_ado_proeject:
+                  enum:
+                    - Yes
+                ado_project_name:
+                  title: ADO Project Name
+                  type: string
+                  enum:
+                    - PepsiCo_CloudMarketPlace
+                    - PepsiCo_MountainMarketPlace
+                    - PepsiCo_SeaMarketPlace
+                ado_project_type:
+                  title: ADO Project Type
+                  type: string
+                  enum:
+                    - Advanced
+                    - Normal
+                    - Minor
+    - title: Application
+      required:
+        - business_application
+        - application_service
+      properties:
+        business_application:
+          title: Business Application
+          type: string  
+        application_service:
+          title: Application Service
+          type: string
+          enum:
+            - CLOUD MARKETPLACE(CMP) PROD
+            - CLOUD MARKETPLACE(CMP) DEV 
+        application_name:
+          title: Application Name
+          type: string 
+        application_short_name:
+          title: Application Short Name
+          type: string 
+        account_owner:
+          title: Application/Service Account Owner 
+          type: string 
+    - title: Service Resources 
+      properties:
+        project_admin:
+          title: Project Admin
+          type: boolean
+          description: "Project Admin desc"
+          default: false 
+        board:
+          title: Board
+          type: boolean
+          description: "Board desc"
+          default: false 
+        pipelines:
+          title: Pipelines
+          type: boolean
+          description: "Pipelines desc"
+          default: false 
+        sonarqube:
+          title: SonarQube
+          type: boolean
+          description: "SonarQube desc"
+          default: false  
+        testme:
+          title: "Project Admins"
+          description: |
+            The following users are admins for this project:
+            
+            - admin1@example.com
+            - admin2@example.com
+            - admin3@example.com
+          type: string
+          ui:field: textarea
+          default: "These are the current project admins."
+          readOnly: true
+        
+  steps:
+    - id: log-message
+      name: Log Message
+      action: debug:log
+      input:
+        message: 'Hello, Matthew!'
+  
+  output:
+    message: 'The parameters you provided are: ${{ parameters.application_service }}'
