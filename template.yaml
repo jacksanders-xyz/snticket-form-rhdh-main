@@ -14,6 +14,7 @@ spec:
     - title: Project
       required:
         - ado_platform
+        - sector
       properties:
         sector:
           title: Sector
@@ -34,14 +35,14 @@ spec:
           type: string
           enum:
             - No
-            - Yes 
+            - Yes
       dependencies:
         have_ado_proeject:
           oneOf:
             - properties:
                 have_ado_proeject:
                   enum:
-                    - No 
+                    - No
             - properties:
                 have_ado_proeject:
                   enum:
@@ -67,49 +68,49 @@ spec:
       properties:
         business_application:
           title: Business Application
-          type: string  
+          type: string
         application_service:
           title: Application Service
           type: string
           enum:
             - CLOUD MARKETPLACE(CMP) PROD
-            - CLOUD MARKETPLACE(CMP) DEV 
+            - CLOUD MARKETPLACE(CMP) DEV
         application_name:
           title: Application Name
-          type: string 
+          type: string
         application_short_name:
           title: Application Short Name
-          type: string 
+          type: string
         account_owner:
-          title: Application/Service Account Owner 
-          type: string 
-    - title: Service Resources 
+          title: Application/Service Account Owner
+          type: string
+    - title: Service Resources
       properties:
         project_admin:
           title: Project Admin
           type: boolean
           description: "Project Admin desc"
-          default: false 
+          default: false
         board:
           title: Board
           type: boolean
           description: "Board desc"
-          default: false 
+          default: false
         pipelines:
           title: Pipelines
           type: boolean
           description: "Pipelines desc"
-          default: false 
+          default: false
         sonarqube:
           title: SonarQube
           type: boolean
           description: "SonarQube desc"
-          default: false  
+          default: false
         testme:
           title: "Project Admins"
           description: |
             The following users are admins for this project:
-            
+
             - admin1@example.com
             - admin2@example.com
             - admin3@example.com
@@ -117,13 +118,34 @@ spec:
           ui:field: textarea
           default: "These are the current project admins."
           readOnly: true
-        
+
   steps:
     - id: log-message
       name: Log Message
       action: debug:log
       input:
-        message: 'Hello, Matthew!'
-  
+        message: 'Hello, Matthew! You are onboarding a project to Azure DevOps.'
+
+    - id: snowcreate
+      name: Create ServiceNow Ticket
+      action: servicenow:now:table:createRecord
+      input:
+        tableName: x_1520818_pepsico_pepsionboarding
+        requestBody: {
+          application_owner: "${{ parameters.application_owner }}",
+          project_sector: "${{ parameters.project_sector }}",
+          project_ado_platform: "${{ parameters.project_ado_platform }}",
+          business_application: "${{ parameters.business_application }}",
+          application_service: "${{ parameters.application_service }}",
+          application_name: "${{ parameters.application_name }}"
+        }
+
   output:
-    message: 'The parameters you provided are: ${{ parameters.application_service }}'
+    text:
+    - title: ServiceNow Ticket Created
+      content: |
+        ServiceNow ticket was created successfully with the following details:
+        - System ID: "${{ steps.snowcreate.output.result.sys_id }}"
+        - Ticket Number: "${{ steps.snowcreate.output.result.number }}"
+        - Application Name: "${{ steps.snowcreate.output.result.application_name }}"
+
